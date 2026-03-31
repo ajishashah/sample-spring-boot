@@ -8,9 +8,14 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import java.io.IOException;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 public class EmployeeApiSteps {
@@ -30,6 +35,21 @@ public class EmployeeApiSteps {
     public void iRequestEmployeeWithId(long id) {
         String url = "http://localhost:" + port + "/employees/" + id;
         response = restTemplate.getForEntity(url, String.class);
+    }
+
+    @When("I update employee name for id {long} to {string}")
+    public void iUpdateEmployeeNameForIdTo(long id, String name) {
+        String url = "http://localhost:" + port + "/employees/" + id + "/name";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<Map<String, String>> request = new HttpEntity<>(Map.of("name", name), headers);
+        response = restTemplate.exchange(url, HttpMethod.PUT, request, String.class);
+    }
+
+    @When("I delete employee with id {long}")
+    public void iDeleteEmployeeWithId(long id) {
+        String url = "http://localhost:" + port + "/employees/" + id;
+        response = restTemplate.exchange(url, HttpMethod.DELETE, null, String.class);
     }
 
     @Then("the response status should be {int}")
