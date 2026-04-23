@@ -1,44 +1,68 @@
 package com.example.demo;
 
-import java.util.Set;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import scala.collection.mutable.HashSet;
+import org.springframework.web.bind.annotation.DeleteMapping;
 
 @RestController
 public class GreetingController {
+
+    @Autowired
+    private EmployeeRepository employeeRepository;
 
     @GetMapping("/greeting")
     public String greeting(@RequestParam(defaultValue = "World") String name) {
         return "Hello, " + name + "!";
     }
 
-        // Copies all elements from a Set<Integer> into an int array
-        public int[] setToIntArray(java.util.Set<Integer> set) {
-            int[] arr = new int[set.size()];
-            int i = 0;
-            for (int num : set) {
-                arr[i++] = num;
-            }
-            return arr;
+    @GetMapping("/employees/{id}")
+    public ResponseEntity<Employee> getEmployee(@PathVariable Long id) {
+        return employeeRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/employees/{id}/name")
+    public ResponseEntity<Employee> updateEmplyeeName(@PathVariable Long id,
+                                                      @RequestBody UpdateEmployeeNameRequest request) {
+        if (request == null || request.getName() == null || request.getName().isBlank()) {
+            return ResponseEntity.badRequest().build();
         }
-        public HashSet<Integer> convertToSet(int[] arr) {
-            HashSet<Integer> set = new HashSet<>();
-            for (int num : arr) {
-                set.add(num);
-            }
-            return set;
+
+        return employeeRepository.findById(id)
+                .map(employee -> {
+                    employee.setName(request.getName());
+                    return ResponseEntity.ok(employeeRepository.save(employee));
+                })
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/employees/{id}")
+    public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
+        if (employeeRepository.existsById(id)) {
+            employeeRepository.deleteById(id);
+            return ResponseEntity.noContent().build();
         }
-        public int findMissingNumber(int[] arr) {
-            int n = arr.length + 1; // Since one number is missing
-            int totalSum = n * (n + 1) / 2; // Sum of first n natural numbers
-            int arrSum = 0;
-            for (int num : arr) {
-                arrSum += num;
-            }
-            return totalSum - arrSum; // The missing number
+
+        return ResponseEntity.notFound().build();
+    }
+
+    public static class UpdateEmployeeNameRequest {
+        private String name;
+
+        public String getName() {
+            return name;
         }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+    }
+
 }
