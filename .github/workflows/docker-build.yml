@@ -23,7 +23,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t sample-spring-boot:latest .
+          docker build -t springbootsample:latest .
       
       - name: Login to GHCR
         uses: docker/login-action@v3
@@ -37,5 +37,5 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/myapp:latest
+          tags: ghcr.io/ajishashah/springbootsample:latest
 
