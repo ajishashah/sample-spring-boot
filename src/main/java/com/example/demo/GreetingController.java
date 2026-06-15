@@ -16,6 +16,11 @@ public class GreetingController {
     @Autowired
     private EmployeeRepository employeeRepository;
 
+    @GetMapping("/")
+    public ResponseEntity<String> warmup() {
+        return ResponseEntity.ok("OK");
+    }
+
     @GetMapping("/greeting")
     public String greeting(@RequestParam(defaultValue = "World") String name) {
         return "Hello, " + name + "!";
