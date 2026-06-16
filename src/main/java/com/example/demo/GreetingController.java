@@ -1,5 +1,7 @@
 package com.example.demo;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,13 +18,17 @@ public class GreetingController {
     @Autowired
     private EmployeeRepository employeeRepository;
 
+    Logger logger = LoggerFactory.getLogger(GreetingController.class);
+
     @GetMapping("/")
     public ResponseEntity<String> warmup() {
         return ResponseEntity.ok("OK");
     }
 
     @GetMapping("/greeting")
-    public String greeting(@RequestParam(defaultValue = "World") String name) {
+    public String greeting(@RequestParam(defaultValue = "Ajisha") String name) {
+       
+        logger.info("Received greeting request for name: {}", name);
         return "Hello, " + name + "!";
     }
 
